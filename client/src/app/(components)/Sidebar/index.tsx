@@ -82,7 +82,7 @@ const Sidebar = () => {
         }`}
       >
         <Image
-          src= " "
+          src= "/assets/logo.png"
           alt="edstock-logo"
           width={27}
           height={27}
