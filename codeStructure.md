@@ -66,3 +66,6 @@ This is a Next.js project with TypeScript and Tailwind CSS. The main structure f
   - Reusable components in the `(components)` directory
   - Page routes following Next.js file-based routing
   - Global styling and layout files
+
+This was created using this script: 
+ - To package up your codebase for AI use, run `npx ai-digest` in your project directory
