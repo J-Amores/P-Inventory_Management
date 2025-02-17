@@ -72,7 +72,8 @@ export default nextConfig;
     "react-redux": "^9.2.0",
     "recharts": "^2.12.7",
     "redux-persist": "^6.0.0",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -163,17 +164,16 @@ export default Header;
 # src/app/(components)/Navbar/index.tsx
 
 ```tsx
+// src/app/(components)/Navbar/index.tsx
 "use client";
-
-
 
 import { Bell, Menu, Moon, Settings, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import useStore from "@/store/useStore";
 
 const Navbar = () => {
-
+  const { theme, setTheme, sidebarOpen, setSidebarOpen, user } = useStore();
 
   return (
     <div className="flex justify-between items-center w-full mb-7">
@@ -181,7 +181,7 @@ const Navbar = () => {
       <div className="flex justify-between items-center gap-5">
         <button
           className="px-3 py-3 bg-gray-100 rounded-full hover:bg-blue-100"
-          
+          onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           <Menu className="w-4 h-4" />
         </button>
@@ -193,7 +193,7 @@ const Navbar = () => {
             className="pl-10 pr-4 py-2 w-50 md:w-60 border-2 border-gray-300 bg-white rounded-lg focus:outline-none focus:border-blue-500"
           />
 
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-non">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Bell className="text-gray-500" size={20} />
           </div>
         </div>
@@ -203,8 +203,15 @@ const Navbar = () => {
       <div className="flex justify-between items-center gap-5">
         <div className="hidden md:flex justify-between items-center gap-5">
           <div>
-            <button>
-              
+            <button
+              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              className="p-2 rounded-full hover:bg-gray-100"
+            >
+              {theme === 'light' ? (
+                <Moon className="text-gray-500" size={20} />
+              ) : (
+                <Sun className="text-gray-500" size={20} />
+              )}
             </button>
           </div>
           <div className="relative">
@@ -222,7 +229,7 @@ const Navbar = () => {
               height={50}
               className="rounded-full h-full object-cover"
             />
-            <span className="font-semibold"></span>
+            <span className="font-semibold">{user?.name || 'Guest'}</span>
           </div>
         </div>
         <Link href="/settings">
@@ -251,9 +258,8 @@ const Rating = ({}) => {
 # src/app/(components)/Sidebar/index.tsx
 
 ```tsx
+// src/app/(components)/Sidebar/index.tsx
 "use client";
-
-
 
 import {
   Archive,
@@ -268,7 +274,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import useStore from "@/store/useStore";
 
 interface SidebarLinkProps {
   href: string;
@@ -276,27 +282,56 @@ interface SidebarLinkProps {
   label: string;
 }
 
-const Sidebar = () => {
-
+const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
   return (
-    <div>
-      {/* TOP LOGO */}
+    <Link href={href}>
       <div
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer
+          ${isActive ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
       >
-        <Image
-          src= "/assets/logo.png"
-          alt="edstock-logo"
-          width={27}
-          height={27}
-          className="rounded w-8"
-        />
-        <h1
-        >
-          EDSTOCK
-        </h1>
+        <Icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+        <span className={isActive ? 'font-semibold' : 'text-gray-700'}>{label}</span>
+      </div>
+    </Link>
+  );
+};
+
+const Sidebar = () => {
+  const { sidebarOpen, setSidebarOpen } = useStore();
+
+  const links = [
+    { href: "/dashboard", icon: Layout, label: "Dashboard" },
+    { href: "/inventory", icon: Archive, label: "Inventory" },
+    { href: "/products", icon: Clipboard, label: "Products" },
+    { href: "/expenses", icon: CircleDollarSign, label: "Expenses" },
+    { href: "/users", icon: User, label: "Users" },
+    { href: "/settings", icon: SlidersHorizontal, label: "Settings" },
+  ];
+
+  return (
+    <div className={`h-screen bg-white shadow-lg transition-all duration-300 
+      ${sidebarOpen ? 'w-64' : 'w-20'} p-4 flex flex-col`}>
+      {/* TOP LOGO */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/assets/logo.png"
+            alt="edstock-logo"
+            width={27}
+            height={27}
+            className="rounded w-8"
+          />
+          {sidebarOpen && (
+            <h1 className="text-xl font-bold">EDSTOCK</h1>
+          )}
+        </div>
 
         <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-full hover:bg-gray-100"
         >
           <Menu className="w-4 h-4" />
         </button>
@@ -304,11 +339,13 @@ const Sidebar = () => {
 
       {/* LINKS */}
       <div className="flex-grow mt-8">
-
+        {links.map((link) => (
+          <SidebarLink key={link.href} {...link} />
+        ))}
       </div>
 
       {/* FOOTER */}
-      <div>
+      <div className="mt-auto">
         <p className="text-center text-xs text-gray-500">&copy; 2024 Edstock</p>
       </div>
     </div>
@@ -335,41 +372,47 @@ export default Dashboard
 # src/app/dashboardWrapper.tsx
 
 ```tsx
+
 "use client"
 
 import React, { useEffect } from "react";
 import Navbar from "@/app/(components)/Navbar";
 import Sidebar from "./(components)/Sidebar";
-
-
-
-
+import useStore from "@/store/useStore";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  const { theme, sidebarOpen } = useStore();
 
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+  
+  return (
+    <div className={`flex h-screen ${theme}`}>
+      <Sidebar />
+      <main className={`flex-1 p-8 transition-all duration-300 
+        ${sidebarOpen ? 'ml-64' : 'ml-20'} 
+        bg-gray-50 dark:bg-gray-900`}>
+        <Navbar />
+        {children}
+      </main>
+    </div>
+  );
+};
 
-  
-    return (
-      <div
-      >
-        <Sidebar />
-        <main
-        >
-          <Navbar />
-          {children}
-        </main>
-      </div>
-    );
-  };
-  
-  const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
-    return (
-        <DashboardLayout>{children}</DashboardLayout>
+const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+  // Initialize store here if needed
+  useEffect(() => {
+    useStore.persist.rehydrate();
+  }, []);
 
-    );
-  };
-  
-  export default DashboardWrapper;
+  return (
+    <DashboardLayout>{children}</DashboardLayout>
+  );
+};
+
+export default DashboardWrapper;
 ```
 
 # src/app/expenses/page.tsx
@@ -514,6 +557,113 @@ const Users = () => {
   }
   
   export default Users
+```
+
+# src/store/useStore.ts
+
+```ts
+// src/store/useStore.ts
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+interface Product {
+  id: string
+  name: string
+  price: number
+  stock: number
+}
+
+interface StoreState {
+  // Auth State
+  user: User | null
+  isAuthenticated: boolean
+  
+  // UI State
+  sidebarOpen: boolean
+  theme: 'light' | 'dark'
+  
+  // Data State
+  products: Product[]
+  loading: boolean
+  error: string | null
+  
+  // Actions
+  setUser: (user: User | null) => void
+  setSidebarOpen: (open: boolean) => void
+  setTheme: (theme: 'light' | 'dark') => void
+  setProducts: (products: Product[]) => void
+  addProduct: (product: Product) => void
+  updateProduct: (id: string, updates: Partial<Product>) => void
+  deleteProduct: (id: string) => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
+}
+
+const useStore = create<StoreState>()(
+  persist(
+    (set) => ({
+      // Initial state
+      user: null,
+      isAuthenticated: false,
+      sidebarOpen: true,
+      theme: 'light',
+      products: [],
+      loading: false,
+      error: null,
+
+      // Actions
+      setUser: (user) => 
+        set((state) => ({ 
+          user, 
+          isAuthenticated: !!user 
+        })),
+      
+      setSidebarOpen: (open) => 
+        set(() => ({ sidebarOpen: open })),
+      
+      setTheme: (theme) => 
+        set(() => ({ theme })),
+      
+      setProducts: (products) => 
+        set(() => ({ products })),
+      
+      addProduct: (product) => 
+        set((state) => ({ 
+          products: [...state.products, product] 
+        })),
+      
+      updateProduct: (id, updates) => 
+        set((state) => ({
+          products: state.products.map((product) =>
+            product.id === id ? { ...product, ...updates } : product
+          ),
+        })),
+      
+      deleteProduct: (id) => 
+        set((state) => ({
+          products: state.products.filter((product) => product.id !== id),
+        })),
+      
+      setLoading: (loading) => 
+        set(() => ({ loading })),
+      
+      setError: (error) => 
+        set(() => ({ error })),
+    }),
+    {
+      name: 'app-storage', // name of the item in localStorage
+      skipHydration: true, // needed for Next.js
+    }
+  )
+)
+
+export default useStore
 ```
 
 # tailwind.config.ts
