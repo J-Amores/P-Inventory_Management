@@ -1,18 +1,25 @@
-import { ExpenseSummaryCard } from "@/app/dashboard/expense-summary-card";
-import { ExpenseLineChart } from "@/app/dashboard/expense-pie-chart";
-import expenseSummaryData from "@/Data/expenseSummary.json";
-import expenseByCategoryData from "@/Data/expenseByCategory.json";
-
-export default function Dashboard() {
+export default function DashboardPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="text-muted-foreground mt-2">Welcome to your dashboard</p>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
-        <ExpenseSummaryCard data={expenseSummaryData} />
-        <ExpenseLineChart data={expenseByCategoryData} />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="border p-3 rounded-lg">
+          <h3>Products</h3>
+          <p className="text-2xl">0</p>
+        </div>
+        <div className="border p-3 rounded-lg">
+          <h3>Low Stock</h3>
+          <p className="text-2xl">0</p>
+        </div>
+        <div className="border p-3 rounded-lg">
+          <h3>Expenses</h3>
+          <p className="text-2xl">$0</p>
+        </div>
+        <div className="border p-3 rounded-lg">
+          <h3>Value</h3>
+          <p className="text-2xl">$0</p>
+        </div>
       </div>
     </div>
-  );
+  )
 } 

@@ -1,11 +1,5 @@
-import { Metadata } from "next";
-import Dashboard from "./dashboard/page";
+import DashboardPage from "./dashboard/page";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Main dashboard view",
-};
-
-export default function HomePage() {
-  return <Dashboard />;
+export default function Home() {
+  return <DashboardPage />;
 }
