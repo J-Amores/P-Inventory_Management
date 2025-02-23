@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { LayoutWrapper } from "@/app/components/layout-wrapper"
 
 
 const inter = Inter({ subsets: ["latin"] })
@@ -19,15 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        
-          <div className="flex min-h-screen">
-           
-            <main className="flex-1">
-             
-              <div className="p-8">{children}</div>
-            </main>
-          </div>
-       
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
       </body>
     </html>
   )
