@@ -12,3 +12,76 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+// Product model based on products.json
+model Product {
+  id             String  @id @map("productId")
+  name           String
+  price          Float
+  rating         Float
+  stockQuantity  Int
+  sales          Sale[]
+
+  @@map("products")
+}
+
+// Sale model based on sales.json
+model Sale {
+  id          String   @id @map("saleId")
+  productId   String
+  timestamp   DateTime
+  quantity    Int
+  unitPrice   Float
+  totalAmount Float
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("sales")
+}
+
+// User model based on users.json
+model User {
+  id    String @id @map("userId")
+  name  String
+  email String
+
+  @@map("users")
+}
+
+// ExpenseByCategory model based on expenseByCategory.json
+model ExpenseByCategory {
+  id               String        @id @map("expenseByCategoryId")
+  expenseSummaryId String
+  date             DateTime
+  category         ExpenseCategory
+  amount           Int
+  expenseSummary   ExpenseSummary @relation(fields: [expenseSummaryId], references: [id])
+
+  @@map("expense_by_category")
+}
+
+// SalesSummary model based on salesSummary.json
+model SalesSummary {
+  id               String   @id @map("salesSummaryId")
+  totalValue       Float
+  changePercentage Float
+  date             DateTime
+
+  @@map("sales_summary")
+}
+
+// ExpenseSummary model (referenced by ExpenseByCategory)
+model ExpenseSummary {
+  id                String             @id @map("expenseSummaryId")
+  totalExpenses     Float
+  date             DateTime
+  expenseCategories ExpenseByCategory[]
+
+  @@map("expense_summary")
+}
+
+// Enum for expense categories
+enum ExpenseCategory {
+  Office
+  Salaries
+  Professional
+}
