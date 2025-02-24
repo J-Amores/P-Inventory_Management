@@ -91,7 +91,8 @@ A comprehensive inventory management system with a modern Next.js frontend and E
    - DashboardController
    - ProductController
    - ExpenseController
-   - User management (pending)
+   - AuthController
+   - User management
 
 2. **Database Models (Prisma)**
    - Users
@@ -105,7 +106,9 @@ A comprehensive inventory management system with a modern Next.js frontend and E
    - `/api/dashboard/metrics`
    - `/api/products`
    - `/api/expenses/category`
-   - Additional endpoints (planned)
+   - `/api/auth/login`
+   - `/api/auth/refresh`
+   - `/api/auth/logout`
 
 ### Deployment
 1. **Vercel Setup**
@@ -130,12 +133,14 @@ A comprehensive inventory management system with a modern Next.js frontend and E
 - Data seeding functionality
 - Vercel deployment configuration
 - Frontend integration
+- Error handling middleware
+- Security middleware implementation
 
 ### In Progress
 - API optimization
 - Error handling improvements
 - Additional endpoints
-- Security implementation
+- Security implementation (JWT auth in progress)
 - Performance optimization
 - SQLite database optimization
 
@@ -186,6 +191,7 @@ A comprehensive inventory management system with a modern Next.js frontend and E
 6. Environment variable protection
 7. SQLite file security
 8. Vercel environment isolation
+9. JWT authentication (in progress)
 
 ## Deployment Guidelines
 1. Configure Vercel project settings
@@ -275,4 +281,75 @@ A comprehensive inventory management system with a modern Next.js frontend and E
    - Handle single-writer constraint
    - Manage file size growth
    - Plan for data partitioning
-   - Implement proper error handling 
+   - Implement proper error handling
+
+## Frontend Structure
+- App Router pattern with server components for dashboard routes
+- Hybrid rendering (SSR for dashboard, CSR for admin interfaces)
+- API routes handling backend communication
+- Layout system with shared UI components (sidebar/navbar)
+
+## Zustand State Management Pattern
+
+### Example store for inventory management
+import { create } from 'zustand';
+
+interface InventoryState {
+  products: Product[];
+  selectedCategories: string[];
+  sortOrder: 'asc' | 'desc';
+  actions: {
+    bulkUpdateStock: (productIds: UUID[], adjustment: number) => Promise<void>;
+    applyFilters: (filters: InventoryFilter) => void;
+  };
+}
+
+export const useInventoryStore = create<InventoryState>((set) => ({
+  products: [],
+  selectedCategories: [],
+  sortOrder: 'asc',
+  actions: {
+    bulkUpdateStock: async (productIds, adjustment) => {
+      // API call to backend Prisma service
+      await fetch('/api/inventory/bulk-update', {
+        method: 'POST',
+        body: JSON.stringify({ productIds, adjustment })
+      });
+      // Optimistic UI update
+      set(state => ({
+        products: state.products.map(p => 
+          productIds.includes(p.productId) 
+            ? {...p, stockQuantity: p.stockQuantity + adjustment}
+            : p
+        )
+      }));
+    },
+    // ... existing filter logic ...
+  }
+})); 
+
+Next.js Frontend → React Query → API Routes → Prisma Client → SQLite
+          ↑                   ↓
+      Zustand Store ← Optimistic Updates 
+
+## API route for inventory updates
+export async function POST(req: Request) {
+  const db = new PrismaClient({
+    datasourceUrl: process.env.DATABASE_URL,
+    // SQLite-specific configuration
+    adapter: {
+      query: require('@prisma/adapter-sqlite').sqliteAdapter
+    }
+  });
+  
+  try {
+    return await db.$transaction(async (tx) => {
+      // ... transaction logic ...
+    }, {
+      maxWait: 5000,  // SQLite transaction timeout
+      timeout: 10000
+    });
+  } finally {
+    await db.$disconnect();
+  }
+} 
