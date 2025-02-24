@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { ModeToggle } from "./components/mode-toggle";
+import DashboardPage from "./dashboard/page";
 
 export default function Home() {
   return (
     <div>
-      <h1>Hello World</h1>
+      <DashboardPage />
       <ModeToggle />
     </div>
   );
