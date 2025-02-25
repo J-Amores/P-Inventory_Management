@@ -1,57 +1,17 @@
-import { Button } from "../components/ui/button"
 import { Card } from "../components/ui/card"
-import { Input } from "../components/ui/input"
 import { StatCard } from "../components/stat-card"
 import { InventoryChart } from "../inventory/inventory-chart"
 import { InventoryTable } from "../inventory/inventory-table"
-import { ExpensePieChart } from "../dashboard/expense-pie-chart"
-import { PopularProducts } from "../dashboard/popular-products"
+import { ExpensePieChart } from "./expense-pie-chart"
+import { PopularProducts } from "./popular-products"
 import { DateRangePicker } from "../components/ui/date-range-picker"
-import { Box, BarChart3, Truck, Package, ShoppingCart, LifeBuoy, Settings, Layers } from "lucide-react"
+import { Sidebar } from "../components/sidebar"
 
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="grid lg:grid-cols-[280px_1fr]">
-        <aside className="border-r bg-card/50 backdrop-blur">
-          <div className="flex h-16 items-center gap-2 border-b px-6">
-            <Box className="h-6 w-6" />
-            <span className="font-bold">InventoryPro</span>
-          </div>
-          <div className="px-4 py-4">
-            <Input placeholder="Search inventory" className="bg-background/50" />
-          </div>
-          <nav className="space-y-2 px-2">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Layers className="h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Package className="h-4 w-4" />
-              Products
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Truck className="h-4 w-4" />
-              Suppliers
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Orders
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Reports
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <LifeBuoy className="h-4 w-4" />
-              Support
-            </Button>
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <Settings className="h-4 w-4" />
-              Settings
-            </Button>
-          </nav>
-        </aside>
+        <Sidebar />
         <main className="p-6">
           <div className="mb-6 flex items-center justify-between">
             <div className="space-y-1">
@@ -113,4 +73,6 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
 
