@@ -3,10 +3,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { productId: string } }
 ) {
   try {
-    const productId = params.id;
+    const productId = params.productId;
     
     const product = await prisma.products.findUnique({
       where: { productId },
@@ -35,10 +35,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { productId: string } }
 ) {
   try {
-    const productId = params.id;
+    const productId = params.productId;
     const body = await request.json();
     
     const updatedProduct = await prisma.products.update({
@@ -63,10 +63,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { productId: string } }
 ) {
   try {
-    const productId = params.id;
+    const productId = params.productId;
     
     // First, delete any related Sales and Purchases
     await prisma.sales.deleteMany({

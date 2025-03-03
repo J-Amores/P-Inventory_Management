@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, Edit, Trash2, Star } from "lucide-react"
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/app/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/app/components/ui/card"
+import { Badge } from "@/app/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+} from "@/app/components/ui/dialog"
+import { Label } from "@/app/components/ui/label"
+import { Input } from "@/app/components/ui/input"
 
 // Sample inventory data - in a real app, this would come from an API or database
 const inventoryItems = [
@@ -247,27 +247,27 @@ const purchaseHistory = [
   },
 ]
 
-const getStockStatus = (quantity) => {
+const getStockStatus = (quantity: number) => {
   if (quantity <= 50000) return "Out of Stock"
   if (quantity <= 200000) return "Low Stock"
   return "In Stock"
 }
 
-const formatDate = (dateString) => {
+const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   return date.toLocaleDateString("en-US", {
     year: "numeric",
-    month: "short",
+    month: "long",
     day: "numeric",
   })
 }
 
-export default function InventoryItemPage({ params }: { params: { id: string } }) {
+export default function InventoryItemPage({ params }: { params: { productId: string } }) {
   const router = useRouter()
-  const { id } = params
+  const { productId } = params
 
-  const item = inventoryItems.find((item) => item.productId === id)
-  const itemPurchases = purchaseHistory.filter((purchase) => purchase.productId === id)
+  const item = inventoryItems.find((item) => item.productId === productId)
+  const itemPurchases = purchaseHistory.filter((purchase) => purchase.productId === productId)
 
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
@@ -321,7 +321,22 @@ export default function InventoryItemPage({ params }: { params: { id: string } }
                 <CardTitle className="text-2xl">{item.name}</CardTitle>
                 <CardDescription>{item.productId}</CardDescription>
               </div>
-              <Badge variant={status === "In Stock" ? "default" : status === "Low Stock" ? "warning" : "destructive"}>
+              <Badge 
+                variant={
+                  status === "In Stock"
+                    ? "default"
+                    : status === "Low Stock"
+                    ? "secondary"
+                    : "destructive"
+                }
+                className={
+                  status === "In Stock"
+                    ? "bg-green-500"
+                    : status === "Low Stock"
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
+                }
+              >
                 {status}
               </Badge>
             </CardHeader>

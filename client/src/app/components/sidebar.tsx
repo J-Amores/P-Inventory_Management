@@ -4,9 +4,12 @@ import { useTheme } from "next-themes"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Box, BarChart3, Truck, Package, ShoppingCart, LifeBuoy, Settings, Layers, Sun, Moon } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export function Sidebar() {
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark")
@@ -28,34 +31,69 @@ export function Sidebar() {
         <Input placeholder="Search inventory" className="bg-background/50" />
       </div>
       <nav className="space-y-2 px-2">
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <Layers className="h-4 w-4" />
-          Dashboard
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <Package className="h-4 w-4" />
-          Products
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <Truck className="h-4 w-4" />
-          Suppliers
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <ShoppingCart className="h-4 w-4" />
-          Orders
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <BarChart3 className="h-4 w-4" />
-          Reports
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <LifeBuoy className="h-4 w-4" />
-          Support
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <Settings className="h-4 w-4" />
-          Settings
-        </Button>
+        <Link href="/dashboard" className="block">
+          <Button 
+            variant={pathname === "/dashboard" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <Layers className="h-4 w-4" />
+            Dashboard
+          </Button>
+        </Link>
+        <Link href="/inventory" className="block">
+          <Button 
+            variant={pathname === "/inventory" || pathname.startsWith("/inventory/") ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <Package className="h-4 w-4" />
+            Products
+          </Button>
+        </Link>
+        <Link href="/suppliers" className="block">
+          <Button 
+            variant={pathname === "/suppliers" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <Truck className="h-4 w-4" />
+            Suppliers
+          </Button>
+        </Link>
+        <Link href="/orders" className="block">
+          <Button 
+            variant={pathname === "/orders" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Orders
+          </Button>
+        </Link>
+        <Link href="/expenses" className="block">
+          <Button 
+            variant={pathname === "/expenses" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Expenses
+          </Button>
+        </Link>
+        <Link href="/support" className="block">
+          <Button 
+            variant={pathname === "/support" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <LifeBuoy className="h-4 w-4" />
+            Support
+          </Button>
+        </Link>
+        <Link href="/settings" className="block">
+          <Button 
+            variant={pathname === "/settings" ? "secondary" : "ghost"} 
+            className="w-full justify-start gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
+        </Link>
       </nav>
     </aside>
   )
