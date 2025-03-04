@@ -23,6 +23,25 @@ interface ProductDetails {
   rating: number | null;
 }
 
+// Function to format currency values consistently
+function formatCurrency(value: number): string {
+  if (value >= 100000) {
+    // Round to nearest 100K for large values
+    const roundedValue = Math.round(value / 100000) * 100000;
+    if (roundedValue >= 1000000) {
+      return `$${(roundedValue / 1000000).toFixed(1)}M`;
+    } else {
+      return `$${(roundedValue / 1000).toFixed(0)}K`;
+    }
+  } else if (value >= 1000) {
+    // Format thousands with K
+    return `$${(value / 1000).toFixed(1)}K`;
+  } else {
+    // Format smaller values normally
+    return `$${value.toFixed(2)}`;
+  }
+}
+
 async function getPopularProducts(): Promise<ProductSalesData[]> {
   try {
     // Get top selling products (most quantity sold)
@@ -38,19 +57,22 @@ async function getPopularProducts(): Promise<ProductSalesData[]> {
         },
       },
       take: 5,
-    }) as SalesGroupResult[];
+    });
+
+    // Convert the result to our expected type
+    const salesResults = topSellingProducts as unknown as SalesGroupResult[];
 
     // Get product details for top selling products
-    const productIds = topSellingProducts.map((product: SalesGroupResult) => product.productId);
+    const productIds = salesResults.map(product => product.productId);
     const productDetails = await prisma.products.findMany({
       where: {
         productId: { in: productIds },
       },
-    }) as ProductDetails[];
+    });
 
     // Combine sales data with product details
-    return topSellingProducts.map((sales: SalesGroupResult) => {
-      const product = productDetails.find((p: ProductDetails) => p.productId === sales.productId);
+    return salesResults.map(sales => {
+      const product = productDetails.find(p => p.productId === sales.productId);
       return {
         productId: sales.productId,
         name: product?.name || 'Unknown Product',
@@ -82,11 +104,11 @@ export async function PopularProducts() {
           <div className="space-y-1">
             <p className="font-medium leading-none">{product.name}</p>
             <p className="text-sm text-muted-foreground">
-              {product.totalQuantity} units sold
+              {product.totalQuantity.toLocaleString()} units sold
             </p>
           </div>
           <div className="font-medium">
-            ${product.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {formatCurrency(product.totalAmount)}
           </div>
         </div>
       ))}

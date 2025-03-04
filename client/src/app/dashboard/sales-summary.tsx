@@ -48,13 +48,23 @@ async function getSalesSummary() {
   }
 }
 
+// Function to round to nearest 100K
+function roundToNearest100K(value: number): string {
+  const roundedValue = Math.round(value / 100000) * 100000;
+  if (roundedValue >= 1000000) {
+    return `$${(roundedValue / 1000000).toFixed(1)}M`;
+  } else {
+    return `$${(roundedValue / 1000).toFixed(0)}K`;
+  }
+}
+
 export async function SalesSummary() {
   const salesData = await getSalesSummary();
 
   return (
     <StatCard
       title="Total Sales"
-      value={`$${salesData.totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+      value={roundToNearest100K(salesData.totalValue)}
       change={{
         value: `$${Math.abs(salesData.changeValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         percentage: `${salesData.isPositive ? '+' : '-'}${Math.abs(salesData.changePercentage).toFixed(1)}%`,
