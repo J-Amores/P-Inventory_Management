@@ -29,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog"
+import { AppLayout } from "../components/app-layout"
 
 interface InventoryItem {
   productId: string
@@ -74,15 +75,17 @@ export default function InventoryPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
+      <AppLayout>
+        <div className="flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+      </AppLayout>
     )
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-6">
+      <AppLayout>
         <Card className="bg-destructive/10">
           <CardContent className="p-6">
             <div className="flex flex-col items-center space-y-2">
@@ -91,7 +94,7 @@ export default function InventoryPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </AppLayout>
     )
   }
 
@@ -128,7 +131,7 @@ export default function InventoryPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <AppLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Inventory Management</h1>
         <Button asChild>
@@ -279,7 +282,7 @@ export default function InventoryPage() {
         </AlertDialogContent>
       </AlertDialog>
       <Toaster />
-    </div>
+    </AppLayout>
   )
 }
 

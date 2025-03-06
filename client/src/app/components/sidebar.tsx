@@ -18,10 +18,10 @@ export function Sidebar() {
   return (
     <aside className="border-r bg-card/50 backdrop-blur">
       <div className="flex h-16 items-center justify-between border-b px-6">
-        <div className="flex items-center gap-2">
+        <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Box className="h-6 w-6" />
           <span className="font-bold">InventoryPro</span>
-        </div>
+        </Link>
         <Button variant="ghost" size="icon" onClick={toggleTheme}>
           {theme === "dark" ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
           <span className="sr-only">Toggle theme</span>
