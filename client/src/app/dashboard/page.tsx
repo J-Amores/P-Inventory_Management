@@ -1,16 +1,19 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { InventoryChart } from "../inventory/inventory-chart"
 import { InventoryTable } from "../inventory/inventory-table"
-import { ExpensePieChart } from "./expense-pie-chart"
-import { PopularProducts } from "./popular-products"
 import { DateRangePicker } from "../components/ui/date-range-picker"
 import { AppLayout } from "../components/app-layout"
-import { SalesSummary } from "./sales-summary"
-import { PurchasesSummary } from "./purchases-summary"
-import { TotalStockValue, LowStockItems, OutOfStockItems, TotalProducts } from "./inventory-metrics"
+import { TotalRevenue, LowStockItems, OutOfStockItems, TotalProducts } from "./inventory-metrics"
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
+import { SalesTrendChart } from "./sales-trend-chart"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  // Fetch all metrics data
+  const revenueData = await TotalRevenue()
+  const lowStockData = await LowStockItems()
+  const outOfStockData = await OutOfStockItems()
+  const totalProductsData = await TotalProducts()
+
   return (
     <AppLayout>
       <div className="flex flex-col gap-4">
@@ -25,7 +28,7 @@ export default function DashboardPage() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="sales">Sales & Purchases</TabsTrigger>
+            <TabsTrigger value="sales">Sales</TabsTrigger>
             <TabsTrigger value="inventory">Inventory</TabsTrigger>
           </TabsList>
           
@@ -34,91 +37,164 @@ export default function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Stock Value</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <TotalStockValue />
+                  <div className="text-2xl font-bold">{revenueData.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {revenueData.change.isPositive ? (
+                      <>
+                        <span className="text-green-500 inline-flex items-center">
+                          <ArrowUpIcon className="h-4 w-4 mr-1" />
+                          {revenueData.change.value} ({revenueData.change.percentage})
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-red-500 inline-flex items-center">
+                          <ArrowDownIcon className="h-4 w-4 mr-1" />
+                          {revenueData.change.value} ({revenueData.change.percentage})
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M3 3v18h18" />
+                    <path d="m19 9-5 5-4-4-3 3" />
+                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <LowStockItems />
+                  <div className="text-2xl font-bold">{lowStockData.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {lowStockData.change.isPositive ? (
+                      <>
+                        <span className="text-green-500 inline-flex items-center">
+                          <ArrowUpIcon className="h-4 w-4 mr-1" />
+                          {lowStockData.change.value} ({lowStockData.change.percentage})
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-red-500 inline-flex items-center">
+                          <ArrowDownIcon className="h-4 w-4 mr-1" />
+                          {lowStockData.change.value} ({lowStockData.change.percentage})
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v12M16 10H8" />
+                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <OutOfStockItems />
+                  <div className="text-2xl font-bold">{outOfStockData.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {outOfStockData.change.isPositive ? (
+                      <>
+                        <span className="text-green-500 inline-flex items-center">
+                          <ArrowUpIcon className="h-4 w-4 mr-1" />
+                          {outOfStockData.change.value} ({outOfStockData.change.percentage})
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-red-500 inline-flex items-center">
+                          <ArrowDownIcon className="h-4 w-4 mr-1" />
+                          {outOfStockData.change.value} ({outOfStockData.change.percentage})
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-muted-foreground"
+                  >
+                    <path d="M2 20h.01M7 20v-4m0 0v-4m0 4h.01M17 20v-4m0 0V8m0 8h.01M12 20v-4m0 0V4m0 12h.01M17 8h.01" />
+                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <TotalProducts />
+                  <div className="text-2xl font-bold">{totalProductsData.value}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {totalProductsData.change.isPositive ? (
+                      <>
+                        <span className="text-green-500 inline-flex items-center">
+                          <ArrowUpIcon className="h-4 w-4 mr-1" />
+                          {totalProductsData.change.value} ({totalProductsData.change.percentage})
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-red-500 inline-flex items-center">
+                          <ArrowDownIcon className="h-4 w-4 mr-1" />
+                          {totalProductsData.change.value} ({totalProductsData.change.percentage})
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </CardContent>
               </Card>
             </div>
             
-            {/* Charts Overview */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sales & Purchases</CardTitle>
-                  <CardDescription>Monthly revenue and expense comparison</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <SalesSummary />
-                    <PurchasesSummary />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Expense Categories</CardTitle>
-                  <CardDescription>Distribution of expenses by category</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ExpensePieChart />
-                </CardContent>
-              </Card>
-            </div>
+            {/* Sales Trend Chart */}
+            <SalesTrendChart />
           </TabsContent>
           
           <TabsContent value="sales" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sales Performance</CardTitle>
-                <CardDescription>Revenue and sales metrics over time</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <SalesSummary />
-                  <PurchasesSummary />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Popular Products</CardTitle>
-                <CardDescription>Your best-selling items</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PopularProducts />
-              </CardContent>
-            </Card>
+            <SalesTrendChart />
           </TabsContent>
           
           <TabsContent value="inventory" className="space-y-4">
