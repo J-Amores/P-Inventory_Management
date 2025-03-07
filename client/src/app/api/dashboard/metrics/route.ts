@@ -40,19 +40,22 @@ export async function GET() {
     });
 
     // Get top selling products (most quantity sold)
-    const topSellingProducts = await prisma.sales.groupBy({
-      by: ['productId'],
+    const topSellingProductsRaw = await prisma.$queryRaw`
+      SELECT "productId", SUM(quantity) as sum_quantity, SUM("totalAmount") as sum_total_amount
+      FROM sales
+      GROUP BY "productId"
+      ORDER BY SUM(quantity) DESC
+      LIMIT 5
+    `;
+
+    // Convert raw query result to expected format
+    const topSellingProducts = (topSellingProductsRaw as any[]).map(item => ({
+      productId: item.productId,
       _sum: {
-        quantity: true,
-        totalAmount: true,
-      },
-      orderBy: {
-        _sum: {
-          quantity: 'desc',
-        },
-      },
-      take: 5,
-    }) as SalesGroupBy[];
+        quantity: Number(item.sum_quantity),
+        totalAmount: Number(item.sum_total_amount)
+      }
+    })) as SalesGroupBy[];
 
     // Get product details for top selling products
     const productIds = topSellingProducts.map((product: SalesGroupBy) => product.productId);

@@ -11,20 +11,23 @@ interface ExpenseGroupResult {
 export async function GET() {
   try {
     // Get all expense categories
-    const allExpenseCategories = await prisma.expenses.groupBy({
-      by: ['category'],
+    const allExpenseCategories = await prisma.$queryRaw`
+      SELECT category, SUM(amount) as sum_amount
+      FROM expenses
+      GROUP BY category
+      ORDER BY SUM(amount) DESC
+    `;
+
+    // Convert raw query result to expected format
+    const formattedCategories = (allExpenseCategories as any[]).map(item => ({
+      category: item.category || 'Uncategorized',
       _sum: {
-        amount: true,
-      },
-      orderBy: {
-        _sum: {
-          amount: 'desc',
-        },
-      },
-    }) as ExpenseGroupResult[];
+        amount: Number(item.sum_amount)
+      }
+    })) as ExpenseGroupResult[];
 
     // Filter out invalid or zero amounts and ensure all categories are named
-    let validCategories = allExpenseCategories
+    let validCategories = formattedCategories
       .filter(item => item._sum.amount !== null && item._sum.amount > 0 && item.category)
       .map(item => ({
         category: item.category || 'Uncategorized',
@@ -52,7 +55,6 @@ export async function GET() {
       };
     });
 
-    console.log('Expense categories fetched:', result);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching expense categories:', error);

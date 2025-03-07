@@ -296,13 +296,11 @@ export default function InventoryItemPage({ params }: { params: { productId: str
   // In a real application, these functions would make API calls
   const handleEdit = () => {
     // Implement edit functionality
-    console.log("Editing item", item.productId)
     setIsEditOpen(false)
   }
 
   const handleDelete = () => {
     // Implement delete functionality
-    console.log("Deleting item", item.productId)
     setIsDeleteOpen(false)
     router.push("/inventory")
   }

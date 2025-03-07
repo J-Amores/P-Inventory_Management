@@ -6,6 +6,7 @@ import { AppLayout } from "../components/app-layout"
 import { TotalRevenue, LowStockItems, OutOfStockItems, TotalProducts } from "./inventory-metrics"
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 import { SalesTrendChart } from "./sales-trend-chart"
+import { SalesTable } from "./sales-table"
 
 export default async function DashboardPage() {
   // Fetch all metrics data
@@ -195,6 +196,7 @@ export default async function DashboardPage() {
           
           <TabsContent value="sales" className="space-y-4">
             <SalesTrendChart />
+            <SalesTable />
           </TabsContent>
           
           <TabsContent value="inventory" className="space-y-4">

@@ -45,18 +45,21 @@ export async function GET(request: Request) {
     });
     
     // Get expenses by category
-    const expensesByCategory = await prisma.expenses.groupBy({
-      by: ['category'],
+    const expensesByCategoryRaw = await prisma.$queryRaw`
+      SELECT category, SUM(amount) as sum_amount
+      FROM expenses
+      ${whereClause ? `WHERE ${whereClause}` : ''}
+      GROUP BY category
+      ORDER BY SUM(amount) DESC
+    `;
+
+    // Convert raw query result to expected format
+    const expensesByCategory = (expensesByCategoryRaw as any[]).map(item => ({
+      category: item.category || 'Uncategorized',
       _sum: {
-        amount: true,
-      },
-      where: whereClause,
-      orderBy: {
-        _sum: {
-          amount: 'desc',
-        },
-      },
-    }) as ExpenseCategoryGroup[];
+        amount: Number(item.sum_amount)
+      }
+    })) as ExpenseCategoryGroup[];
     
     // Calculate total expenses
     const totalExpenses = await prisma.expenses.aggregate({
